@@ -1,0 +1,8 @@
+setup.py
+thick_goban/__init__.py
+thick_goban/go.py
+thick_goban.egg-info/PKG-INFO
+thick_goban.egg-info/SOURCES.txt
+thick_goban.egg-info/dependency_links.txt
+thick_goban.egg-info/not-zip-safe
+thick_goban.egg-info/top_level.txt

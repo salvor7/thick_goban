@@ -1,0 +1,10 @@
+Metadata-Version: 1.0
+Name: thick-goban
+Version: 0.1.0
+Summary: A "think" representation of a Go game position which stores "discoveries" made when changing state for new moves.
+Home-page: http://github.com/salvor7/thick_goban
+Author: Andrew AH Brown
+Author-email: salvor7@gmail.com
+License: MIT
+Description: UNKNOWN
+Platform: UNKNOWN
