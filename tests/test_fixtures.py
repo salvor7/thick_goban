@@ -1,9 +1,11 @@
 from collections import defaultdict
 
-import go
+from thick_goban import go
+
 
 def open_position():
     return go.Position
+
 
 def first_position():
     """Sets up two positions in the

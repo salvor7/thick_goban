@@ -4,7 +4,7 @@ import numpy as np
 
 import pytest
 
-import go
+from thick_goban import go
 import tests.test_fixtures as fixt
 
 fixture_params = [n for n in range(9, 26, 2)]
@@ -176,7 +176,7 @@ def test_move_exceptions(position_moves):
         assert message in str(excinfo.value)
 
 
-def test_Position_actions(position_moves):
+def test_position_actions(position_moves):
     position, moves = position_moves
     s = position.size
     assert (set(range(s ** 2)) - position.actions) - set(moves.keys()) == set()
