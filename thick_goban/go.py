@@ -478,6 +478,37 @@ class Board:
                 pass
             self._find(pt)
 
+    def grayscaled(self):
+        """Produce a gray scale image of the board
+
+        BLACK is set to pixel value 1
+        WHITE is set to pixel value 255
+        BOARD is set to pixel value 128
+
+        :return: np.array       size x size
+        >>> b = Board(size=9)
+        >>> b.change_colour(0, BLACK)
+        >>> b.change_colour(1, WHITE)
+        >>> b.grayscaled()
+        array([[  1, 255, 128, 128, 128, 128, 128, 128, 128],
+               [128, 128, 128, 128, 128, 128, 128, 128, 128],
+               [128, 128, 128, 128, 128, 128, 128, 128, 128],
+               [128, 128, 128, 128, 128, 128, 128, 128, 128],
+               [128, 128, 128, 128, 128, 128, 128, 128, 128],
+               [128, 128, 128, 128, 128, 128, 128, 128, 128],
+               [128, 128, 128, 128, 128, 128, 128, 128, 128],
+               [128, 128, 128, 128, 128, 128, 128, 128, 128],
+               [128, 128, 128, 128, 128, 128, 128, 128, 128]])
+        """
+        black, white, board_colour = 1, 255, 128
+
+        board = np.array(self._board_colour).reshape(self.size, self.size)
+
+        black_moves = (board == 1) * black
+        white_moves = (board == -1) * white
+        open_board = (board == 0) * board_colour
+        return black_moves + white_moves + open_board
+
 
 class BoardError(Exception):
     """Error raised by Board objects when a query or transaction cannot be completed"""
@@ -497,7 +528,11 @@ class Position:
     def __init__(self, *, moves=None, size=19, komi=-7.5, lastmove=None, kolock=None):
         """Initialize a Position with a board of size**2
 
+        :param moves: list of int
         :param size: int
+        :param komi: float
+        :param lastmove: int
+        :param kolock: int
         >>> pos = Position()
         """
         self.kolock = kolock
@@ -513,6 +548,27 @@ class Position:
                 self.move(pt)
         except TypeError:
             pass
+
+    @classmethod
+    def grayscaled_game(cls, moves, **kwargs):
+        """Gray scale images of an entire game
+
+        Takes a moves sequence, and produces the sequence of game positions as grey scaled images.
+        These are formed into a numpy array
+
+        :param moves: list of int   the moves to create gray scaled board images
+        :return: np.array           moves x size x size
+        >>> Position.grayscaled_game([40, 50, 60, 70, 80, 90]).shape
+        (6, 19, 19)
+        """
+        pos = Position(**kwargs)
+        board_sequence = []
+
+        for move in moves:
+            pos.move(move_pt=move)
+            board_sequence.append(pos.board.grayscaled())
+
+        return np.array(board_sequence)
 
     def score(self):
         """Return the score of the position
@@ -698,7 +754,7 @@ class Position:
 
         :return: float
         >>> type(Position(size=9).random_playout()[0])
-        <class 'go.Position'>
+        <class 'thick_goban.go.Position'>
         """
         position = deepcopy(self)
         passes = 0
