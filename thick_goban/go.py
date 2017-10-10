@@ -525,7 +525,7 @@ class Position:
     >>> Position(size=13).size
     13
     """
-    def __init__(self, *, moves=None, size=19, komi=-7.5, lastmove=None, kolock=None):
+    def __init__(self, *, moves=None, handicap=None, size=19, komi=-7.5, lastmove=None, kolock=None):
         """Initialize a Position with a board of size**2
 
         :param moves: list of int
@@ -543,11 +543,16 @@ class Position:
         self.actions = set(range(size ** 2))
         self.board = Board(size=size)
 
-        try:
-            for pt in moves:
+        for handi in (handicap if handicap else []):
+            self.move(handi, BLACK)
+
+        for idx, pt in enumerate(moves if moves else []):
+            try:
                 self.move(pt)
-        except TypeError:
-            pass
+            except TypeError:
+                pass
+            except MoveError as err:
+                raise MoveError(' '.join(['Move', str(idx), 'made at point', str(pt), 'raised a MoveError', str(err)]))
 
     @classmethod
     def grayscaled_game(cls, moves, **kwargs):
@@ -562,10 +567,14 @@ class Position:
         (6, 19, 19)
         """
         pos = Position(**kwargs)
-        board_sequence = []
+        board_sequence = [pos.board.grayscaled()]
 
-        for move in moves:
-            pos.move(move_pt=move)
+        for idx, move in enumerate(moves):
+            try:
+                pos.move(move_pt=move)
+            except MoveError as err:
+                raise MoveError(' '.join(['Move', str(idx), 'made at point', str(move), 'raised a MoveError', str(err)]))
+
             board_sequence.append(pos.board.grayscaled())
 
         return np.array(board_sequence)

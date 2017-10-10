@@ -228,3 +228,52 @@ def test_Group_init():
         assert group.colour == col
         assert group.size == 1
         assert group.liberties == 0
+
+
+def test_failing_sgfs():
+    """Test strange MoveError behaviour
+    
+    While parsing all available sgfs, thick_goban seemed to be raising strange exceptions.
+    Looking at the sgfs in questions didn't reveal what the problem is in any immediate way.
+    As such, this test is intended to replicate the error.
+
+    These moves are from sgf 'chap005a.sgf' of the test sets.
+    Move 185 raised an Illegal MoveError for no apparent reason at the time this test was implemented.
+    
+    Reason found: I forgot about the handicap stones, so various captures didn't occur as expected in the play out,
+    which caused the MoveErrors.
+    I've added in the appropriate handicap stones for these sgfs to test the handicap functionality and the playouts.
+    """
+    chap005a_handi = [72, 288, 300]
+    chap005a_moves = [61, 59, 40, 39, 41, 77, 47, 117, 111, 92, 110, 51, 317, 244, 206, 319, 279, 242, 312, 310, 337, 
+                      192, 321, 302, 339, 204, 168, 65, 66, 45, 99, 103, 118, 85, 69, 70, 88, 136, 83, 102, 63, 84, 137,
+                      155, 50, 89, 105, 159, 108, 86, 106, 156, 44, 240, 54, 53, 93, 74, 73, 55, 91, 35, 222, 241, 224, 
+                      223, 243, 262, 261, 282, 280, 188, 205, 207, 226, 225, 245, 263, 169, 264, 187, 246, 181, 258, 296, 
+                      236, 274, 276, 311, 295, 314, 313, 315, 291, 238, 200, 179, 182, 162, 273, 293, 255, 199, 218, 121, 
+                      160, 139, 178, 122, 123, 157, 143, 163, 161, 306, 104, 287, 249, 180, 268, 307, 328, 330, 308, 289, 
+                      269, 327, 309, 219, 201, 217, 237, 256, 275, 254, 257, 235, 256, 197, 176, 196, 177, 184, 203, 213, 
+                      326, 325, 346, 193, 174, 211, 248, 191, 173, 79, 78, 271, 253, 234, 252, 272, 292, 251, 332, 270, 
+                      286, 305, 323, 285, 267, 195, 175, 344, 304, 348, 343, 347, 266, 290, 324, 294, 185, 46, 64, 26, 
+                      92, 20, 19, 2, 338, 357, 320, 340, 164, 144, 172, 147, 210, 333, 82]
+
+    chap070d_handi = [60, 72, 288]
+    chap070d_moves = [301, 318, 316, 320, 321, 300, 282, 339, 243, 279, 111, 149, 109, 206, 70, 281, 245, 74, 43, 98, 309, 230, 294, 307,
+                     93, 51, 50, 52, 31, 69, 71, 54, 91, 108, 48, 88, 90, 147, 73, 92, 127, 126, 73, 53, 55, 92, 146, 128, 73, 263, 75,
+                     244, 165, 163, 144, 67, 66, 86, 65, 145, 226, 264, 164, 182, 203, 47, 29, 143, 125, 107, 124, 123, 142, 104, 201,
+                     181, 225, 205, 262, 302, 265, 283, 224, 223, 204, 222, 202, 261, 207, 168, 187, 186, 188, 167, 132, 200, 239, 257,
+                     219, 218, 237, 238, 220, 198, 217, 199, 259, 296, 242, 236, 154, 311, 292, 310, 291, 328, 276, 277, 256, 258, 255,
+                     216, 234, 214, 312, 314, 331, 290, 271, 308, 333, 116, 211, 231, 229, 191, 210, 153, 268, 286, 233, 213, 287, 305,
+                     269, 267, 172, 173, 174, 171, 192, 172, 215]
+    failures = []
+    
+    try:
+        go.Position(moves=chap005a_moves, handicap=chap005a_handi)
+    except go.MoveError as err:
+        failures.append(err)
+    try:
+        go.Position(moves=chap070d_moves, handicap=chap070d_handi)
+    except go.MoveError as err:
+        failures.append(err)
+        
+    assert not failures
+        
