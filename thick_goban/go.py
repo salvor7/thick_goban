@@ -561,7 +561,7 @@ class Position:
         :param moves: list of int   the moves to create gray scaled board images
         :return: np.array           moves x size x size
         >>> Position.grayscaled_game([40, 50, 60, 70, 80, 90]).shape
-        (6, 19, 19)
+        (7, 19, 19)
         """
         pos = Position(**kwargs)
         board_sequence = [pos.board.grayscaled()]
