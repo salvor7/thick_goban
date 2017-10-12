@@ -276,4 +276,15 @@ def test_failing_sgfs():
         failures.append(err)
         
     assert not failures
-        
+    
+
+def test_ko_lock_problem():
+    """Ko lock error is triggering incorrectly
+
+    It is being triggered even when the capture is of two or more stones.
+    """
+    moves = [0, 19, 20, 2, 21,  3, 22, 4, 23, 38, 5, 1, 0]
+    try:
+        go.Position(moves=moves)
+    except go.MoveError as err:
+        assert not str(err)

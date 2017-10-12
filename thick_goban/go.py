@@ -437,6 +437,17 @@ class Board:
 
         return group.liberties
 
+    def discover_group_size(self, group_pt):
+        """Find the size of the group at group_pt
+
+        I use discover_liberties to force the group size to be fully reported.
+
+        :param group_pt: int
+        :return: int
+        """
+        self.discover_liberties(group_pt=group_pt)
+        return self._find(pt=group_pt)[0].size
+
     def remove_group(self, dead_pt=None):
         """Remove a group and return the captured stone locations
 
@@ -687,9 +698,7 @@ class Position:
         elif colour not in [BLACK, WHITE]:
             raise MoveError('Unrecognized move colour: ' + str(colour))
 
-        if move_pt == self.kolock:
-            raise MoveError('Illegal Move: Playing in a ko locked point')
-        elif self.board._board_colour[move_pt] is not OPEN:
+        if self.board._board_colour[move_pt] is not OPEN:
             raise MoveError('Illegal Move: Playing on another stone')
 
         neigh_points = defaultdict(set)
@@ -704,6 +713,11 @@ class Position:
 
         if self_capture(move_pt, colour):
             raise MoveError('Illegal Move: Playing a self capture move')
+        length = len(neigh_dead[-colour])
+        if move_pt == self.kolock and len(neigh_dead[-colour]) == 1:
+            neigh_dead_sizes = self.board.discover_group_size(group_pt=neigh_dead[-colour].pop())
+            if neigh_dead_sizes == 1:
+                raise MoveError('Illegal Move: Playing in a ko locked point')
 
         yield   # may never return here, and that's fine
 
