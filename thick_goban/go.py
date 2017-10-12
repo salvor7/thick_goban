@@ -525,7 +525,7 @@ class Position:
     >>> Position(size=13).size
     13
     """
-    def __init__(self, *, moves=None, handicap=None, size=19, komi=-7.5, lastmove=None, kolock=None):
+    def __init__(self, *, moves=None, setup=None, size=19, komi=-7.5, lastmove=None, kolock=None):
         """Initialize a Position with a board of size**2
 
         :param moves: list of int

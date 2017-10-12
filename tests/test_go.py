@@ -244,7 +244,7 @@ def test_failing_sgfs():
     which caused the MoveErrors.
     I've added in the appropriate handicap stones for these sgfs to test the handicap functionality and the playouts.
     """
-    chap005a_handi = [72, 288, 300]
+    chap005a_handi = [(pt, 1) for pt in [72, 288, 300]]
     chap005a_moves = [61, 59, 40, 39, 41, 77, 47, 117, 111, 92, 110, 51, 317, 244, 206, 319, 279, 242, 312, 310, 337, 
                       192, 321, 302, 339, 204, 168, 65, 66, 45, 99, 103, 118, 85, 69, 70, 88, 136, 83, 102, 63, 84, 137,
                       155, 50, 89, 105, 159, 108, 86, 106, 156, 44, 240, 54, 53, 93, 74, 73, 55, 91, 35, 222, 241, 224, 
@@ -256,7 +256,7 @@ def test_failing_sgfs():
                       286, 305, 323, 285, 267, 195, 175, 344, 304, 348, 343, 347, 266, 290, 324, 294, 185, 46, 64, 26, 
                       92, 20, 19, 2, 338, 357, 320, 340, 164, 144, 172, 147, 210, 333, 82]
 
-    chap070d_handi = [60, 72, 288]
+    chap070d_handi = [(pt,1) for pt in [60, 72, 288]]
     chap070d_moves = [301, 318, 316, 320, 321, 300, 282, 339, 243, 279, 111, 149, 109, 206, 70, 281, 245, 74, 43, 98, 309, 230, 294, 307,
                      93, 51, 50, 52, 31, 69, 71, 54, 91, 108, 48, 88, 90, 147, 73, 92, 127, 126, 73, 53, 55, 92, 146, 128, 73, 263, 75,
                      244, 165, 163, 144, 67, 66, 86, 65, 145, 226, 264, 164, 182, 203, 47, 29, 143, 125, 107, 124, 123, 142, 104, 201,
@@ -267,11 +267,11 @@ def test_failing_sgfs():
     failures = []
     
     try:
-        go.Position(moves=chap005a_moves, handicap=chap005a_handi)
+        go.Position(moves=chap005a_moves, setup=chap005a_handi)
     except go.MoveError as err:
         failures.append(err)
     try:
-        go.Position(moves=chap070d_moves, handicap=chap070d_handi)
+        go.Position(moves=chap070d_moves, setup=chap070d_handi)
     except go.MoveError as err:
         failures.append(err)
         
