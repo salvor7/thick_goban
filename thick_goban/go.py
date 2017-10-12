@@ -633,7 +633,7 @@ class Position:
         score = self.score()
         return int(score/abs(score))
 
-    def _move_coroutine(self, move_pt, colour=None):
+    def _move_coroutine(self, move_pt, colour=None, friendly_eye_disallow=False):
         """A coroutine splitting of the move function into check and updates
 
         The expense of move is quite large, and a substantial part of that is the checks
@@ -706,14 +706,14 @@ class Position:
             neigh_colour = self.board._board_colour[neigh_pt]
             neigh_points[neigh_colour] |= {neigh_pt}
 
-        if friendly_eye(move_pt, colour):
+        if friendly_eye_disallow and friendly_eye(move_pt, colour):
             raise MoveError('Poor Choice: Playing in a friendly eye')
 
         neigh_dead = defaultdict(set)
 
         if self_capture(move_pt, colour):
             raise MoveError('Illegal Move: Playing a self capture move')
-        length = len(neigh_dead[-colour])
+
         if move_pt == self.kolock and len(neigh_dead[-colour]) == 1:
             neigh_dead_sizes = self.board.discover_group_size(group_pt=neigh_dead[-colour].pop())
             if neigh_dead_sizes == 1:
@@ -731,7 +731,7 @@ class Position:
         self.next_player = -colour
         self.lastmove = move_pt
 
-    def move(self, move_pt, colour=None):
+    def move(self, move_pt, colour=None, friendly_eye_disallow=False):
         """Play a move on a go board
 
         :param pt: int
@@ -749,7 +749,7 @@ class Position:
         if colour is None:
             colour = self.next_player
 
-        move_routine = self._move_coroutine(move_pt=move_pt, colour=colour)
+        move_routine = self._move_coroutine(move_pt=move_pt, colour=colour, friendly_eye_disallow=friendly_eye_disallow)
         next(move_routine)      # prime the coroutine ie execute to first yield
         try:
             next(move_routine)      # complete the coroutine
@@ -784,7 +784,7 @@ class Position:
 
             move_pt = sample_list[0]
             try:
-                self.move(move_pt)
+                self.move(move_pt, friendly_eye_disallow=True)
             except MoveError:
                 tried |= {move_pt}
             else:

@@ -148,15 +148,15 @@ def test_move_exceptions(position_moves):
     position, moves = position_moves
 
     def suicide_move():
-        position.move((position.size ** 2) - 1, go.BLACK)
+        position.move((position.size ** 2) - 1, go.BLACK, friendly_eye_disallow=True)
 
     def suicide_moveII():
-        position.move(0, go.WHITE)
+        position.move(0, go.WHITE, friendly_eye_disallow=True)
 
     def play_on_all_moves():
         for pt in moves:
             def existing_stone():
-                position.move(pt, go.WHITE)
+                position.move(pt, go.WHITE, friendly_eye_disallow=True)
             yield existing_stone
 
     def bad_colour():
@@ -193,9 +193,9 @@ def test_position_actions(position_moves):
     term_position, moves = position.random_playout()
     for action in term_position.actions:
         with pytest.raises(go.MoveError):
-            term_position.move(action, colour=go.BLACK)
+            term_position.move(action, colour=go.BLACK, friendly_eye_disallow=True)
         with pytest.raises(go.MoveError):
-            term_position.move(action, colour=go.WHITE)
+            term_position.move(action, colour=go.WHITE, friendly_eye_disallow=True)
 
 
 def test_score(position_moves):
