@@ -715,7 +715,7 @@ class Position:
             raise MoveError('Illegal Move: Playing a self capture move')
 
         if move_pt == self.kolock and len(neigh_dead[-colour]) == 1:
-            neigh_dead_sizes = self.board.discover_group_size(group_pt=neigh_dead[-colour].pop())
+            neigh_dead_sizes = self.board.discover_group_size(group_pt=list(neigh_dead[-colour])[0])
             if neigh_dead_sizes == 1:
                 raise MoveError('Illegal Move: Playing in a ko locked point')
 
