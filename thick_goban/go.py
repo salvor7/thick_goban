@@ -1,4 +1,6 @@
+import os
 import random
+import time
 from collections import namedtuple, defaultdict
 from copy import copy, deepcopy
 
@@ -255,21 +257,25 @@ class Board:
         ---------
         <BLANKLINE>
         """
-        BLACKstr = 'X'
-        WHITEstr = 'o'
-        OPENstr = '-'
+        BLACKstr = u'⚫'
+        WHITEstr = u'⚪'
+        OPENstr = '  '
 
-        repre = ''
+        letter_axis = 'A B C D E F G H J K L M N O P Q R S T U V W X Y Z'[:self.size*2]
+        repre = f'   {letter_axis}\n'
         for pt in self:
+            if pt % self.size == 0:
+                repre += f'{(pt//self.size) + 1}'.rjust(2) + ' '
             if self._board_colour[pt] == BLACK:
                 repre += BLACKstr
             elif self._board_colour[pt] == WHITE:
                 repre += WHITEstr
             elif self._board_colour[pt] == OPEN:
                 repre += OPENstr
-
             if (pt + 1) % self.size == 0:
-                repre += '\n'
+                repre += f'{(pt+1)//self.size}\n'
+
+        repre += '   ' + letter_axis
         return repre
 
     def __getitem__(self, item):
@@ -550,6 +556,7 @@ class Position:
         self.komi = komi
         self.size = size
         self.lastmove = lastmove
+        self.pass_count = 0
         self.next_player = BLACK
         self.actions = set(range(size ** 2))
         self.board = Board(size=size)
@@ -731,6 +738,16 @@ class Position:
         self.next_player = -colour
         self.lastmove = move_pt
 
+    def legal_move(self, move_pt, colour=None, friendly_eye_disallow=False):
+        """Determine if a move is legal"""
+        move_routine = self._move_coroutine(move_pt=move_pt, colour=colour, friendly_eye_disallow=friendly_eye_disallow)
+        try:
+            next(move_routine)      # execute coroutine to first yield
+        except MoveError:
+            return False
+        else:
+            return True
+
     def move(self, move_pt, colour=None, friendly_eye_disallow=False):
         """Play a move on a go board
 
@@ -750,11 +767,12 @@ class Position:
             colour = self.next_player
 
         move_routine = self._move_coroutine(move_pt=move_pt, colour=colour, friendly_eye_disallow=friendly_eye_disallow)
-        next(move_routine)      # prime the coroutine ie execute to first yield
+        next(move_routine)      # prime the coroutine and execute to first yield
         try:
             next(move_routine)      # complete the coroutine
         except StopIteration:
-            pass
+            # move is successful
+            self.pass_count = 0
         else:
             raise MoveError('Move coroutine did not end when expected')
 
@@ -766,6 +784,10 @@ class Position:
         self.next_player *= -1
         self.kolock = None
         self.lastmove = None
+        self.pass_count += 1
+
+    def game_over(self):
+        return self.pass_count > 1
 
     def random_move(self, tried=None):
         """Play one random move
@@ -791,7 +813,7 @@ class Position:
                 return move_pt
         raise MoveError('No moves to take')
 
-    def random_playout(self):
+    def random_playout(self, display=False, delay=0.1):
         """Return score after playing to a terminal position randomly
 
         :return: float
@@ -799,17 +821,19 @@ class Position:
         <class 'thick_goban.go.Position'>
         """
         position = deepcopy(self)
-        passes = 0
         moves = {BLACK:set(), WHITE:set()}
-        while passes < 2:
+        while not position.game_over():
             try:
                 colour = position.next_player
                 moves[colour] |= {position.random_move()}
             except MoveError:
                 position.pass_move()
-                passes +=1
             else:
-                passes = 0
+                if display:
+                    printable = position.board
+                    os.system('cls')
+                    print(printable)
+                    time.sleep(delay)
         for colour in moves:
             moves[colour] &= self.actions
 
