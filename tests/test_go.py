@@ -1,11 +1,11 @@
 import itertools
-from collections import defaultdict, namedtuple
+from collections import namedtuple
 import numpy as np
 
 import pytest
 
 from thick_goban import go
-import tests.test_fixtures as fixt
+import tests as fixt
 
 fixture_params = [n for n in range(9, 26, 2)]
 
